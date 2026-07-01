@@ -65,8 +65,18 @@ const SF_BLOCK_FOLDERS = [
   '/gps/',
 ] as const;
 
-// SF textures that live inside a block folder but are 2D items (cables, connectors, etc.).
-const SF_FLAT_FILENAMES = new Set(['energy_connector']);
+// SF textures that live inside a block folder but are 2D items (cables, connectors, capacitors, etc.).
+const SF_FLAT_FILENAMES = new Set([
+  'energy_connector',
+  'small_capacitor',
+  'medium_capacitor',
+  'large_capacitor',
+  'big_capacitor',
+  'energized_capacitor',
+  'carbonado_edged_capacitor',
+  'infinity_capacitor',
+  'void_capacitor',
+]);
 
 /** True for vanilla Minecraft block textures or SF machine/block textures (renders as isometric 3D cube). */
 export function isBlockTexture(itemId: string, path: string): boolean {
