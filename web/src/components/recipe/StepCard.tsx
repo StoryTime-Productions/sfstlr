@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CraftingGrid } from './CraftingGrid';
 import { ItemSlot } from './ItemSlot';
 import { getTexturePath } from '@/lib/texture';
@@ -34,8 +34,13 @@ interface StepCardProps {
 }
 
 export function StepCard({ step, isLast, forceExpanded }: StepCardProps) {
-  const [localExpanded, setLocalExpanded] = useState(true);
-  const expanded = forceExpanded !== undefined ? forceExpanded : localExpanded;
+  const [expanded, setExpanded] = useState(true);
+
+  // Sync with parent collapse-all / expand-all, but allow individual toggle afterward
+  useEffect(() => {
+    if (forceExpanded !== undefined) setExpanded(forceExpanded);
+  }, [forceExpanded]);
+
   const machineTexture = getTexturePath(step.recipeType);
 
   return (
@@ -49,7 +54,7 @@ export function StepCard({ step, isLast, forceExpanded }: StepCardProps) {
         {/* Header — always visible, click to toggle */}
         <button
           type="button"
-          onClick={() => setLocalExpanded((e) => !e)}
+          onClick={() => setExpanded((e) => !e)}
           className="w-full flex items-center gap-2 px-4 py-3 hover:bg-muted/50 transition-colors text-left"
         >
           <span className="text-xs font-mono text-muted-foreground bg-muted px-1.5 py-0.5 rounded shrink-0">

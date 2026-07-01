@@ -15,22 +15,11 @@ interface CraftingGridProps {
 }
 
 export function CraftingGrid({ ingredients, operations, slotSize = 56 }: CraftingGridProps) {
-  // Merge duplicate slots (same value → sum totalNeeded)
-  const merged = new Map<string, Ingredient>();
-  for (const ing of ingredients) {
-    const existing = merged.get(ing.value);
-    if (existing) {
-      merged.set(ing.value, { ...existing, totalNeeded: existing.totalNeeded + ing.totalNeeded });
-    } else {
-      merged.set(ing.value, { ...ing });
-    }
-  }
-  const slots: (Ingredient | null)[] = Array(9).fill(null);
-  let i = 0;
-  for (const ing of merged.values()) {
-    if (i >= 9) break;
-    slots[i++] = ing;
-  }
+  // Preserve slot positions from the recipe array — each index is a grid slot (0=top-left … 8=bottom-right)
+  const slots: (Ingredient | null)[] = ingredients
+    .slice(0, 9)
+    .map((ing) => (ing?.value ? ing : null));
+  while (slots.length < 9) slots.push(null);
 
   return (
     <div
