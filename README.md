@@ -1,6 +1,8 @@
 <p align="center">
-  <strong>SFSTLR</strong> — Slimefun raw material list + step-by-step recipe resolver
+  <img src="assets/banner.png" alt="SFSTLR" />
 </p>
+
+<p align="center">Slimefun raw material list + step-by-step recipe resolver</p>
 
 <p align="center">
     <a href="https://github.com/StoryTime-Productions/sfstlr/graphs/contributors">
