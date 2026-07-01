@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+
+# Next.js
+web/.next/
+web/out/
+
+# Generated textures (extracted from local files, not committed)
+web/public/textures/
+
+# SFSTLR CLI cache
+.sfstlr/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Coverage
+coverage/
+web/coverage/
+
+# Build
+dist/
+
+# Ralph planning artifacts
+specs/
+IMPLEMENTATION_PLAN.md
+CICD_PLAN.md
+web/specs/
+web/IMPLEMENTATION_PLAN.md

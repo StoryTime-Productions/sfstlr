@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+
+  /* Minecraft-inspired dark stone theme with Slimefun green accents */
+  --background: 220 15% 10%;
+  --foreground: 210 20% 90%;
+
+  --card: 220 15% 14%;
+  --card-foreground: 210 20% 90%;
+
+  --primary: 142 60% 45%;
+  --primary-foreground: 220 15% 10%;
+
+  --secondary: 220 12% 20%;
+  --secondary-foreground: 210 20% 85%;
+
+  --muted: 220 12% 18%;
+  --muted-foreground: 210 15% 55%;
+
+  --accent: 220 12% 22%;
+  --accent-foreground: 210 20% 90%;
+
+  --destructive: 0 63% 45%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 220 12% 22%;
+  --input: 220 12% 22%;
+  --ring: 142 60% 45%;
+}
+
+:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+body {
+  margin: 0;
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Helvetica,
+    Arial,
+    Apple Color Emoji,
+    Segoe UI Emoji;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
