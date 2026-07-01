@@ -15,7 +15,10 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@sfstlr/resolver": ["../src/resolver.js"],
+      "@sfstlr/blacklist": ["../src/blacklist.js"],
+      "@sfstlr/data": ["../src/data.js"]
     },
     "plugins": [{ "name": "next" }]
   },

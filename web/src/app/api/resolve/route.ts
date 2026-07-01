@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-// @ts-expect-error — ESM JS module without types
 import { loadItems } from '@sfstlr/data';
-// @ts-expect-error — ESM JS module without types
 import { resolve, cleanName } from '@sfstlr/resolver';
 
 // Levenshtein for fuzzy suggestions on bad IDs (same logic as CLI)
@@ -60,7 +58,7 @@ export async function POST(req: NextRequest) {
     ),
   }));
 
-  const result = resolve(targets, items);
+  const result = resolve(targets, items as Map<string, object>);
 
   return NextResponse.json({
     targets,
