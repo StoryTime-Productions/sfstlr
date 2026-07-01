@@ -1,6 +1,7 @@
 'use client';
 import { ItemSlot } from './ItemSlot';
 import recipeShapes from '@/lib/recipe_shapes.json';
+import { fmtCount } from '@/lib/format';
 
 interface Ingredient {
   value: string;
@@ -14,6 +15,7 @@ interface CraftingGridProps {
   operations: number;
   itemId?: string;
   slotSize?: number;
+  showStacks?: boolean;
 }
 
 const shapes = recipeShapes as Record<string, boolean[]>;
@@ -23,6 +25,7 @@ export function CraftingGrid({
   operations,
   itemId,
   slotSize = 56,
+  showStacks = false,
 }: CraftingGridProps) {
   const nonEmpty = ingredients.filter((ing) => ing?.value);
   const mask = itemId ? shapes[itemId] : undefined;
@@ -48,7 +51,7 @@ export function CraftingGrid({
           key={idx}
           itemId={slot?.value}
           itemName={slot?.value}
-          amount={slot ? Math.ceil(slot.totalNeeded / operations) : undefined}
+          amount={slot ? fmtCount(Math.ceil(slot.totalNeeded / operations), showStacks) : undefined}
           size={slotSize}
         />
       ))}

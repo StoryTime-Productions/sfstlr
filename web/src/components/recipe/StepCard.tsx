@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { CraftingGrid } from './CraftingGrid';
 import { ItemSlot } from './ItemSlot';
 import { getTexturePath } from '@/lib/texture';
+import { fmtCount } from '@/lib/format';
 
 interface Ingredient {
   value: string;
@@ -31,9 +32,10 @@ interface StepCardProps {
   isLast?: boolean;
   /** Override from parent (collapse-all / expand-all). undefined = use local state. */
   forceExpanded?: boolean;
+  showStacks?: boolean;
 }
 
-export function StepCard({ step, isLast, forceExpanded }: StepCardProps) {
+export function StepCard({ step, isLast, forceExpanded, showStacks = false }: StepCardProps) {
   const [expanded, setExpanded] = useState(true);
 
   // Sync with parent collapse-all / expand-all, but allow individual toggle afterward
@@ -108,6 +110,7 @@ export function StepCard({ step, isLast, forceExpanded }: StepCardProps) {
                 operations={step.operations}
                 itemId={step.id}
                 slotSize={52}
+                showStacks={showStacks}
               />
 
               <span className="text-2xl text-muted-foreground select-none">→</span>
@@ -116,7 +119,7 @@ export function StepCard({ step, isLast, forceExpanded }: StepCardProps) {
                 <ItemSlot
                   itemId={step.id}
                   itemName={step.name}
-                  amount={step.totalProduced}
+                  amount={fmtCount(step.totalProduced, showStacks)}
                   size={64}
                 />
                 <span className="text-xs text-center text-foreground/80 max-w-[80px] leading-tight">

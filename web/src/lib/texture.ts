@@ -21,6 +21,22 @@ const ALIASES: Record<string, string> = {
   green_stained_glass_pane: 'green_stained_glass',
   red_stained_glass_pane: 'red_stained_glass',
   black_stained_glass_pane: 'black_stained_glass',
+  // Vanilla "Block of X" display names → Minecraft texture namespace keys
+  block_of_amethyst: 'amethyst_block',
+  block_of_coal: 'coal_block',
+  block_of_copper: 'copper_block',
+  block_of_diamond: 'diamond_block',
+  block_of_emerald: 'emerald_block',
+  block_of_gold: 'gold_block',
+  block_of_iron: 'iron_block',
+  block_of_lapis_lazuli: 'lapis_block',
+  block_of_netherite: 'netherite_block',
+  block_of_quartz: 'quartz_block',
+  block_of_raw_copper: 'raw_copper_block',
+  block_of_raw_gold: 'raw_gold_block',
+  block_of_raw_iron: 'raw_iron_block',
+  block_of_redstone: 'redstone_block',
+  waxed_block_of_copper: 'copper_block',
 };
 
 export function getTexturePath(itemId: string): string {

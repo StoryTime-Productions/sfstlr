@@ -6,7 +6,7 @@ import { BlockModel } from './BlockModel';
 interface ItemSlotProps {
   itemId?: string;
   itemName?: string;
-  amount?: number;
+  amount?: number | string;
   size?: number; // px, default 64
   className?: string;
 }
@@ -23,7 +23,7 @@ export function ItemSlot({ itemId, itemName, amount, size = 64, className }: Ite
         className
       )}
       style={{ width: size, height: size, flexShrink: 0 }}
-      title={itemName ? `${itemName}${amount && amount > 1 ? ` x${amount}` : ''}` : undefined}
+      title={itemName ? `${itemName}${amount && amount !== 1 ? ` x${amount}` : ''}` : undefined}
     >
       {showBlock ? (
         <BlockModel src={src} alt={itemName ?? ''} size={size} />
@@ -40,7 +40,7 @@ export function ItemSlot({ itemId, itemName, amount, size = 64, className }: Ite
           }}
         />
       )}
-      {amount !== undefined && amount > 1 && (
+      {amount !== undefined && amount !== 1 && amount !== '1' && (
         <span
           className="absolute bottom-0.5 right-1 text-white font-bold leading-none select-none"
           style={{ fontSize: Math.max(10, size / 5), textShadow: '1px 1px 0 #000' }}
