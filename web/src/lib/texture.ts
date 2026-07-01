@@ -77,6 +77,7 @@ const SF_FLAT_FILENAMES = new Set([
   'carbonado_edged_capacitor',
   'infinity_capacitor',
   'void_capacitor',
+  'netherstar_reactor',
 ]);
 
 /** True for vanilla Minecraft block textures or SF machine/block textures (renders as isometric 3D cube). */
