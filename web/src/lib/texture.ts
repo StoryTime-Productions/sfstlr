@@ -34,10 +34,20 @@ export function getTexturePath(itemId: string): string {
 
 export const SLOT_EMPTY = index['pane_gray'] ?? '/textures/fallback.png';
 
-/** True for vanilla Minecraft block textures (should render as isometric 3D cube). */
+// Slimefun folder segments whose contents are placed blocks (rendered as 3D cubes).
+const SF_BLOCK_FOLDERS = [
+  '/machines/',
+  '/basic_machines/',
+  '/cargo/',
+  '/energy/',
+  '/androids/',
+  '/gps/',
+] as const;
+
+/** True for vanilla Minecraft block textures or SF machine/block textures (renders as isometric 3D cube). */
 export function isBlockTexture(itemId: string, path: string): boolean {
   const key = itemId.toLowerCase().replace(/\s+/g, '_');
-  // Items in ALIASES use item/generated (flat 2D sprite) even though their texture is from block/
   if (key in ALIASES) return false;
-  return path.includes('/minecraft/textures/block/');
+  if (path.includes('/minecraft/textures/block/')) return true;
+  return SF_BLOCK_FOLDERS.some((f) => path.includes(f));
 }

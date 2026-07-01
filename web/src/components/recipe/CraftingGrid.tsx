@@ -1,5 +1,6 @@
 'use client';
 import { ItemSlot } from './ItemSlot';
+import recipeShapes from '@/lib/recipe_shapes.json';
 
 interface Ingredient {
   value: string;
@@ -11,15 +12,31 @@ interface Ingredient {
 interface CraftingGridProps {
   ingredients: Ingredient[];
   operations: number;
+  itemId?: string;
   slotSize?: number;
 }
 
-export function CraftingGrid({ ingredients, operations, slotSize = 56 }: CraftingGridProps) {
-  // Preserve slot positions from the recipe array — each index is a grid slot (0=top-left … 8=bottom-right)
-  const slots: (Ingredient | null)[] = ingredients
-    .slice(0, 9)
-    .map((ing) => (ing?.value ? ing : null));
-  while (slots.length < 9) slots.push(null);
+const shapes = recipeShapes as Record<string, boolean[]>;
+
+export function CraftingGrid({
+  ingredients,
+  operations,
+  itemId,
+  slotSize = 56,
+}: CraftingGridProps) {
+  const nonEmpty = ingredients.filter((ing) => ing?.value);
+  const mask = itemId ? shapes[itemId] : undefined;
+
+  let slots: (Ingredient | null)[];
+  if (mask && mask.filter(Boolean).length === nonEmpty.length) {
+    // Distribute flat ingredients into their shaped positions
+    let idx = 0;
+    slots = mask.map((occupied) => (occupied ? (nonEmpty[idx++] ?? null) : null));
+  } else {
+    // Fallback: pack left-to-right (no shape data)
+    slots = nonEmpty.slice(0, 9);
+    while (slots.length < 9) slots.push(null);
+  }
 
   return (
     <div

@@ -106,6 +106,7 @@ export function StepCard({ step, isLast, forceExpanded }: StepCardProps) {
               <CraftingGrid
                 ingredients={step.ingredients}
                 operations={step.operations}
+                itemId={step.id}
                 slotSize={52}
               />
 
