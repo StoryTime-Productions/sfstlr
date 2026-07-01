@@ -1,8 +1,6 @@
 name: CI
 
 on:
-  push:
-    branches: ['**']
   pull_request:
     branches: [main]
 
@@ -65,10 +63,11 @@ jobs:
       - run: npm ci
       - name: Lint commit messages
         run: |
-          npx commitlint \
-            --from ${{ github.event.pull_request.base.sha || 'HEAD~1' }} \
-            --to HEAD \
-            --verbose
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            npx commitlint --from ${{ github.event.pull_request.base.sha }} --to HEAD --verbose
+          else
+            npx commitlint --last --verbose
+          fi
 
   test:
     name: Test & Coverage
