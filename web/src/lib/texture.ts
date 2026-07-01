@@ -5,6 +5,7 @@ const index = textureIndex as Record<string, string>;
 // Flat items that borrow another item's texture — these stay 2D even though
 // the resolved texture may live in a block folder.
 const FLAT_ALIASES: Record<string, string> = {
+  eye_of_ender: 'ender_eye',
   glass_pane: 'glass',
   gray_stained_glass_pane: 'gray_stained_glass',
   white_stained_glass_pane: 'white_stained_glass',
