@@ -2,9 +2,9 @@ import textureIndex from '../../public/textures/index.json';
 
 const index = textureIndex as Record<string, string>;
 
-// Items whose inventory icon uses a different texture than their own name.
-// Source: Minecraft item model JSON (item/generated with layer0 pointing elsewhere).
-const ALIASES: Record<string, string> = {
+// Flat items that borrow another item's texture — these stay 2D even though
+// the resolved texture may live in a block folder.
+const FLAT_ALIASES: Record<string, string> = {
   glass_pane: 'glass',
   gray_stained_glass_pane: 'gray_stained_glass',
   white_stained_glass_pane: 'white_stained_glass',
@@ -21,7 +21,11 @@ const ALIASES: Record<string, string> = {
   green_stained_glass_pane: 'green_stained_glass',
   red_stained_glass_pane: 'red_stained_glass',
   black_stained_glass_pane: 'black_stained_glass',
-  // Vanilla "Block of X" display names → Minecraft texture namespace keys
+};
+
+// Vanilla "Block of X" display names → Minecraft texture namespace keys.
+// These ARE 3D blocks, so they are NOT in FLAT_ALIASES.
+const BLOCK_ALIASES: Record<string, string> = {
   block_of_amethyst: 'amethyst_block',
   block_of_coal: 'coal_block',
   block_of_copper: 'copper_block',
@@ -39,10 +43,11 @@ const ALIASES: Record<string, string> = {
   waxed_block_of_copper: 'copper_block',
 };
 
+const ALIASES: Record<string, string> = { ...FLAT_ALIASES, ...BLOCK_ALIASES };
+
 export function getTexturePath(itemId: string): string {
   const key = itemId.toLowerCase().replace(/\s+/g, '_');
   const resolved = ALIASES[key] ?? key;
-  // Some blocks only have a _top face texture in the JAR (e.g. glass_pane_top, not glass_pane)
   return (
     index[resolved] ?? index[resolved + '_top'] ?? index[key + '_top'] ?? '/textures/fallback.png'
   );
@@ -60,10 +65,15 @@ const SF_BLOCK_FOLDERS = [
   '/gps/',
 ] as const;
 
+// SF textures that live inside a block folder but are 2D items (cables, connectors, etc.).
+const SF_FLAT_FILENAMES = new Set(['energy_connector']);
+
 /** True for vanilla Minecraft block textures or SF machine/block textures (renders as isometric 3D cube). */
 export function isBlockTexture(itemId: string, path: string): boolean {
   const key = itemId.toLowerCase().replace(/\s+/g, '_');
-  if (key in ALIASES) return false;
+  if (key in FLAT_ALIASES) return false;
   if (path.includes('/minecraft/textures/block/')) return true;
+  const filename = path.split('/').pop()?.replace('.png', '') ?? '';
+  if (SF_FLAT_FILENAMES.has(filename)) return false;
   return SF_BLOCK_FOLDERS.some((f) => path.includes(f));
 }
