@@ -1,6 +1,8 @@
 import textureIndex from '../../public/textures/index.json';
+import spriteFramesData from './sprite_frames.json';
 
 const index = textureIndex as Record<string, string>;
+const spriteFrames = spriteFramesData as Record<string, number>;
 
 // Flat items that borrow another item's texture — these stay 2D even though
 // the resolved texture may live in a block folder.
@@ -79,6 +81,13 @@ const SF_FLAT_FILENAMES = new Set([
   'void_capacitor',
   'netherstar_reactor',
 ]);
+
+/** Returns the number of animation frames for a sprite-column texture, or 1 if it's a still image. */
+export function getSpriteFrames(itemId: string): number {
+  const key = itemId.toLowerCase().replace(/\s+/g, '_');
+  const resolved = ALIASES[key] ?? key;
+  return spriteFrames[resolved] ?? spriteFrames[key] ?? 1;
+}
 
 /** True for vanilla Minecraft block textures or SF machine/block textures (renders as isometric 3D cube). */
 export function isBlockTexture(itemId: string, path: string): boolean {
