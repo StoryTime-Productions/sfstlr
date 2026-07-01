@@ -5,9 +5,7 @@ node_modules/
 web/.next/
 web/out/
 
-# Generated textures (extracted from local files, not committed)
-web/public/textures/**
-!web/public/textures/index.json
+# Textures are committed so Vercel can serve them — regenerate locally with npm run extract-textures
 
 # SFSTLR CLI cache
 .sfstlr/

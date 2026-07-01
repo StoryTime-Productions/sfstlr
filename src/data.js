@@ -3,7 +3,8 @@ import { join } from 'path';
 import { homedir } from 'os';
 
 const ITEMS_URL = 'https://raw.githubusercontent.com/Seggan/SFCalc-Online/master/src/items.json';
-const CACHE_DIR = join(homedir(), '.sfstlr');
+// /tmp is writable on Vercel serverless; homedir() is read-only there
+const CACHE_DIR = process.env.VERCEL ? '/tmp/.sfstlr' : join(homedir(), '.sfstlr');
 const CACHE_FILE = join(CACHE_DIR, 'items.json');
 const CACHE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 

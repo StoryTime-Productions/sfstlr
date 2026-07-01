@@ -1,4 +1,3 @@
 .next/
 node_modules/
-public/textures/**
-!public/textures/index.json
+# Textures committed — see root .gitignore note
