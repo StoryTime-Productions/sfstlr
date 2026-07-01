@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-// @ts-expect-error — ESM JS module without types
 import { loadItems } from '@sfstlr/data';
-// @ts-expect-error — ESM JS module without types
 import { cleanName } from '@sfstlr/resolver';
 
 let itemsCache: Map<string, { id: string; name: string }> | null = null;

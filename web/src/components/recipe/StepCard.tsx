@@ -1,8 +1,9 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CraftingGrid } from './CraftingGrid';
 import { ItemSlot } from './ItemSlot';
 import { getTexturePath } from '@/lib/texture';
+import { fmtCount } from '@/lib/format';
 
 interface Ingredient {
   value: string;
@@ -31,11 +32,17 @@ interface StepCardProps {
   isLast?: boolean;
   /** Override from parent (collapse-all / expand-all). undefined = use local state. */
   forceExpanded?: boolean;
+  showStacks?: boolean;
 }
 
-export function StepCard({ step, isLast, forceExpanded }: StepCardProps) {
-  const [localExpanded, setLocalExpanded] = useState(true);
-  const expanded = forceExpanded !== undefined ? forceExpanded : localExpanded;
+export function StepCard({ step, isLast, forceExpanded, showStacks = false }: StepCardProps) {
+  const [expanded, setExpanded] = useState(true);
+
+  // Sync with parent collapse-all / expand-all, but allow individual toggle afterward
+  useEffect(() => {
+    if (forceExpanded !== undefined) setExpanded(forceExpanded);
+  }, [forceExpanded]);
+
   const machineTexture = getTexturePath(step.recipeType);
 
   return (
@@ -49,7 +56,7 @@ export function StepCard({ step, isLast, forceExpanded }: StepCardProps) {
         {/* Header — always visible, click to toggle */}
         <button
           type="button"
-          onClick={() => setLocalExpanded((e) => !e)}
+          onClick={() => setExpanded((e) => !e)}
           className="w-full flex items-center gap-2 px-4 py-3 hover:bg-muted/50 transition-colors text-left"
         >
           <span className="text-xs font-mono text-muted-foreground bg-muted px-1.5 py-0.5 rounded shrink-0">
@@ -101,7 +108,9 @@ export function StepCard({ step, isLast, forceExpanded }: StepCardProps) {
               <CraftingGrid
                 ingredients={step.ingredients}
                 operations={step.operations}
+                itemId={step.id}
                 slotSize={52}
+                showStacks={showStacks}
               />
 
               <span className="text-2xl text-muted-foreground select-none">→</span>
@@ -110,7 +119,7 @@ export function StepCard({ step, isLast, forceExpanded }: StepCardProps) {
                 <ItemSlot
                   itemId={step.id}
                   itemName={step.name}
-                  amount={step.totalProduced}
+                  amount={fmtCount(step.totalProduced, showStacks)}
                   size={64}
                 />
                 <span className="text-xs text-center text-foreground/80 max-w-[80px] leading-tight">

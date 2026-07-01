@@ -1,5 +1,7 @@
 'use client';
 import { ItemSlot } from './ItemSlot';
+import recipeShapes from '@/lib/recipe_shapes.json';
+import { fmtCount } from '@/lib/format';
 
 interface Ingredient {
   value: string;
@@ -11,25 +13,32 @@ interface Ingredient {
 interface CraftingGridProps {
   ingredients: Ingredient[];
   operations: number;
+  itemId?: string;
   slotSize?: number;
+  showStacks?: boolean;
 }
 
-export function CraftingGrid({ ingredients, operations, slotSize = 56 }: CraftingGridProps) {
-  // Merge duplicate slots (same value → sum totalNeeded)
-  const merged = new Map<string, Ingredient>();
-  for (const ing of ingredients) {
-    const existing = merged.get(ing.value);
-    if (existing) {
-      merged.set(ing.value, { ...existing, totalNeeded: existing.totalNeeded + ing.totalNeeded });
-    } else {
-      merged.set(ing.value, { ...ing });
-    }
-  }
-  const slots: (Ingredient | null)[] = Array(9).fill(null);
-  let i = 0;
-  for (const ing of merged.values()) {
-    if (i >= 9) break;
-    slots[i++] = ing;
+const shapes = recipeShapes as Record<string, boolean[]>;
+
+export function CraftingGrid({
+  ingredients,
+  operations,
+  itemId,
+  slotSize = 56,
+  showStacks = false,
+}: CraftingGridProps) {
+  const nonEmpty = ingredients.filter((ing) => ing?.value);
+  const mask = itemId ? shapes[itemId] : undefined;
+
+  let slots: (Ingredient | null)[];
+  if (mask && mask.filter(Boolean).length === nonEmpty.length) {
+    // Distribute flat ingredients into their shaped positions
+    let idx = 0;
+    slots = mask.map((occupied) => (occupied ? (nonEmpty[idx++] ?? null) : null));
+  } else {
+    // Fallback: pack left-to-right (no shape data)
+    slots = nonEmpty.slice(0, 9);
+    while (slots.length < 9) slots.push(null);
   }
 
   return (
@@ -42,7 +51,7 @@ export function CraftingGrid({ ingredients, operations, slotSize = 56 }: Craftin
           key={idx}
           itemId={slot?.value}
           itemName={slot?.value}
-          amount={slot ? Math.ceil(slot.totalNeeded / operations) : undefined}
+          amount={slot ? fmtCount(Math.ceil(slot.totalNeeded / operations), showStacks) : undefined}
           size={slotSize}
         />
       ))}

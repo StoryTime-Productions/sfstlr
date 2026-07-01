@@ -21,6 +21,22 @@ const ALIASES: Record<string, string> = {
   green_stained_glass_pane: 'green_stained_glass',
   red_stained_glass_pane: 'red_stained_glass',
   black_stained_glass_pane: 'black_stained_glass',
+  // Vanilla "Block of X" display names → Minecraft texture namespace keys
+  block_of_amethyst: 'amethyst_block',
+  block_of_coal: 'coal_block',
+  block_of_copper: 'copper_block',
+  block_of_diamond: 'diamond_block',
+  block_of_emerald: 'emerald_block',
+  block_of_gold: 'gold_block',
+  block_of_iron: 'iron_block',
+  block_of_lapis_lazuli: 'lapis_block',
+  block_of_netherite: 'netherite_block',
+  block_of_quartz: 'quartz_block',
+  block_of_raw_copper: 'raw_copper_block',
+  block_of_raw_gold: 'raw_gold_block',
+  block_of_raw_iron: 'raw_iron_block',
+  block_of_redstone: 'redstone_block',
+  waxed_block_of_copper: 'copper_block',
 };
 
 export function getTexturePath(itemId: string): string {
@@ -34,10 +50,20 @@ export function getTexturePath(itemId: string): string {
 
 export const SLOT_EMPTY = index['pane_gray'] ?? '/textures/fallback.png';
 
-/** True for vanilla Minecraft block textures (should render as isometric 3D cube). */
+// Slimefun folder segments whose contents are placed blocks (rendered as 3D cubes).
+const SF_BLOCK_FOLDERS = [
+  '/machines/',
+  '/basic_machines/',
+  '/cargo/',
+  '/energy/',
+  '/androids/',
+  '/gps/',
+] as const;
+
+/** True for vanilla Minecraft block textures or SF machine/block textures (renders as isometric 3D cube). */
 export function isBlockTexture(itemId: string, path: string): boolean {
   const key = itemId.toLowerCase().replace(/\s+/g, '_');
-  // Items in ALIASES use item/generated (flat 2D sprite) even though their texture is from block/
   if (key in ALIASES) return false;
-  return path.includes('/minecraft/textures/block/');
+  if (path.includes('/minecraft/textures/block/')) return true;
+  return SF_BLOCK_FOLDERS.some((f) => path.includes(f));
 }

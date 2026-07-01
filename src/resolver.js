@@ -94,9 +94,16 @@ export function resolve(targets, itemMap) {
   }
 
   const sorted = [];
+  let lastMachine = null;
   while (queue.length) {
-    const id = queue.shift();
+    // Prefer same machine as last step to minimise switching overhead
+    let pickIdx = lastMachine
+      ? queue.findIndex((id) => itemMap.get(id)?.recipeType === lastMachine)
+      : -1;
+    if (pickIdx === -1) pickIdx = 0;
+    const [id] = queue.splice(pickIdx, 1);
     sorted.push(id);
+    lastMachine = itemMap.get(id)?.recipeType ?? null;
     for (const dependent of reverseDeps.get(id) ?? []) {
       if (!inDegree.has(dependent)) continue;
       const newDeg = inDegree.get(dependent) - 1;

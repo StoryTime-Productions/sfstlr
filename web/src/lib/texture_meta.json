@@ -1,0 +1,74 @@
+{
+  "/textures/infinityexpansion/textures/machines/infinity_panel.png": {
+    "imgW": 64,
+    "imgH": 64,
+    "faceSize": 16,
+    "top": [16, 0],
+    "front": [16, 16],
+    "right": [32, 16]
+  },
+  "/textures/infinityexpansion/textures/machines/solar_panel.png": {
+    "imgW": 64,
+    "imgH": 64,
+    "faceSize": 16,
+    "top": [16, 0],
+    "front": [16, 16],
+    "right": [32, 16]
+  },
+  "/textures/infinityexpansion/textures/machines/solar_panel_2.png": {
+    "imgW": 64,
+    "imgH": 64,
+    "faceSize": 16,
+    "top": [16, 0],
+    "front": [16, 16],
+    "right": [32, 16]
+  },
+  "/textures/infinityexpansion/textures/machines/solar_panel_3.png": {
+    "imgW": 64,
+    "imgH": 64,
+    "faceSize": 16,
+    "top": [16, 0],
+    "front": [16, 16],
+    "right": [32, 16]
+  },
+  "/textures/infinityexpansion/textures/machines/void_panel.png": {
+    "imgW": 64,
+    "imgH": 64,
+    "faceSize": 16,
+    "top": [16, 0],
+    "front": [16, 16],
+    "right": [32, 16]
+  },
+  "/textures/slimefun/textures/slimefun/energy/solar_generator.png": {
+    "imgW": 32,
+    "imgH": 32,
+    "faceSize": 16,
+    "top": [0, 0],
+    "front": [16, 0],
+    "right": [16, 0]
+  },
+  "/textures/slimefun/textures/slimefun/energy/solar_generator_2.png": {
+    "imgW": 32,
+    "imgH": 32,
+    "faceSize": 16,
+    "top": [0, 0],
+    "front": [16, 0],
+    "right": [16, 0]
+  },
+  "/textures/slimefun/textures/slimefun/energy/solar_generator_3.png": {
+    "imgW": 32,
+    "imgH": 32,
+    "faceSize": 16,
+    "top": [0, 0],
+    "front": [16, 0],
+    "right": [16, 0]
+  },
+  "/textures/slimefun/textures/slimefun/energy/solar_generator_4.png": {
+    "imgW": 32,
+    "imgH": 32,
+    "faceSize": 16,
+    "top": [0, 0],
+    "front": [16, 0],
+    "right": [16, 0]
+  }
+}

@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { StepCard } from '@/components/recipe/StepCard';
 import { ItemSlot } from '@/components/recipe/ItemSlot';
 import { ItemSearch } from '@/components/recipe/ItemSearch';
+import { fmtCount } from '@/lib/format';
 
 interface Target {
   id: string;
@@ -51,6 +52,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [allExpanded, setAllExpanded] = useState<boolean | undefined>(undefined);
+  const [showStacks, setShowStacks] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const calculate = useCallback(async (targetList: Target[]) => {
@@ -224,7 +226,7 @@ export default function Home() {
                       {name}
                     </span>
                     <span className="text-xs font-mono text-muted-foreground shrink-0">
-                      ×{amount}
+                      ×{fmtCount(amount, showStacks)}
                     </span>
                   </div>
                 ))}
@@ -250,6 +252,12 @@ export default function Home() {
               </h2>
               <div className="flex gap-1.5 ml-auto">
                 <button
+                  onClick={() => setShowStacks((s) => !s)}
+                  className={`text-xs px-2 py-1 rounded transition-colors ${showStacks ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground'}`}
+                >
+                  {showStacks ? 'Stacks' : 'Items'}
+                </button>
+                <button
                   onClick={() => setAllExpanded(true)}
                   className="text-xs px-2 py-1 rounded bg-muted text-muted-foreground hover:text-foreground transition-colors"
                 >
@@ -270,6 +278,7 @@ export default function Home() {
                   step={step}
                   isLast={i === result.steps.length - 1}
                   forceExpanded={allExpanded}
+                  showStacks={showStacks}
                 />
               ))}
             </div>

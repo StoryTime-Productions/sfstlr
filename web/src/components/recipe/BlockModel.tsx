@@ -1,5 +1,17 @@
 'use client';
 import React from 'react';
+import textureMeta from '@/lib/texture_meta.json';
+
+interface FaceMeta {
+  imgW: number;
+  imgH: number;
+  faceSize: number;
+  top: number[];
+  front: number[];
+  right: number[];
+}
+
+const meta = textureMeta as Record<string, FaceMeta>;
 
 interface BlockModelProps {
   src: string;
@@ -19,25 +31,39 @@ interface BlockModelProps {
 export function BlockModel({ src, alt, size }: BlockModelProps) {
   const face = Math.round(size * 0.54);
   const half = face / 2;
+  const fm = meta[src] as FaceMeta | undefined;
 
-  const faceBase: React.CSSProperties = {
-    position: 'absolute',
-    width: face,
-    height: face,
+  function cubemapFace(coords: number[]): React.CSSProperties {
+    const scale = face / fm!.faceSize;
+    return {
+      backgroundImage: `url(${src})`,
+      backgroundSize: `${fm!.imgW * scale}px ${fm!.imgH * scale}px`,
+      backgroundPosition: `${-coords[0] * scale}px ${-coords[1] * scale}px`,
+      backgroundRepeat: 'no-repeat',
+      imageRendering: 'pixelated',
+    };
+  }
+
+  const singleFace: React.CSSProperties = {
     backgroundImage: `url(${src})`,
     backgroundSize: '100% 100%',
     imageRendering: 'pixelated',
   };
 
+  const topStyle = fm ? cubemapFace(fm.top) : singleFace;
+  const frontStyle = fm ? cubemapFace(fm.front) : singleFace;
+  const rightStyle = fm ? cubemapFace(fm.right) : singleFace;
+
+  const faceBase: React.CSSProperties = {
+    position: 'absolute',
+    width: face,
+    height: face,
+  };
+
   return (
     <div
       title={alt}
-      style={{
-        width: size,
-        height: size,
-        position: 'relative',
-        perspective: '800px',
-      }}
+      style={{ width: size, height: size, position: 'relative', perspective: '800px' }}
     >
       <div
         style={{
@@ -46,31 +72,33 @@ export function BlockModel({ src, alt, size }: BlockModelProps) {
           left: '50%',
           width: face,
           height: face,
-          // translate(-50%,-35%) centers; rotateX then rotateY gives true isometric
           transform: `translate(-50%, -35%) rotateX(-35.264deg) rotateY(-45deg)`,
           transformStyle: 'preserve-3d',
         }}
       >
-        {/* Top face — brightest (rotateX(+90°) → local Z → world up) */}
+        {/* Top face — brightest */}
         <div
           style={{
             ...faceBase,
+            ...topStyle,
             transform: `rotateX(90deg) translateZ(${half}px)`,
             filter: 'brightness(1.4)',
           }}
         />
-        {/* Front face — medium (left side of isometric block from viewer) */}
+        {/* Front face — medium */}
         <div
           style={{
             ...faceBase,
+            ...frontStyle,
             transform: `translateZ(${half}px)`,
             filter: 'brightness(0.85)',
           }}
         />
-        {/* Right face — darkest (right side of isometric block from viewer) */}
+        {/* Right face — darkest */}
         <div
           style={{
             ...faceBase,
+            ...rightStyle,
             transform: `rotateY(90deg) translateZ(${half}px)`,
             filter: 'brightness(0.6)',
           }}
