@@ -61,10 +61,7 @@ export function BlockModel({ src, alt, size }: BlockModelProps) {
   };
 
   return (
-    <div
-      title={alt}
-      style={{ width: size, height: size, position: 'relative', perspective: '800px' }}
-    >
+    <div title={alt} style={{ width: size, height: size, position: 'relative' }}>
       <div
         style={{
           position: 'absolute',
@@ -72,7 +69,7 @@ export function BlockModel({ src, alt, size }: BlockModelProps) {
           left: '50%',
           width: face,
           height: face,
-          transform: `translate(-50%, -45%) rotateX(-35.264deg) rotateY(-45deg)`,
+          transform: `translate(-50%, -45%) perspective(800px) rotateX(-35.264deg) rotateY(-45deg)`,
           transformStyle: 'preserve-3d',
         }}
       >

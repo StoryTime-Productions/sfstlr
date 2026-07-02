@@ -1,6 +1,13 @@
 'use client';
-import { getTexturePath, isBlockTexture, SLOT_EMPTY } from '@/lib/texture';
+import {
+  getTexturePath,
+  getSpriteFrameMs,
+  getSpriteFrames,
+  isBlockTexture,
+  SLOT_EMPTY,
+} from '@/lib/texture';
 import { cn } from '@/lib/utils';
+import { AnimatedSprite } from './AnimatedSprite';
 import { BlockModel } from './BlockModel';
 
 interface ItemSlotProps {
@@ -15,6 +22,9 @@ export function ItemSlot({ itemId, itemName, amount, size = 64, className }: Ite
   const src = itemId ? getTexturePath(itemId) : SLOT_EMPTY;
   const isEmpty = !itemId;
   const showBlock = !isEmpty && isBlockTexture(itemId ?? '', src);
+  const frames = !isEmpty && !showBlock ? getSpriteFrames(itemId ?? '') : 1;
+  const frameMs = frames > 1 ? getSpriteFrameMs(itemId ?? '') : 50;
+  const isAnimated = frames > 1;
 
   return (
     <div
@@ -27,6 +37,14 @@ export function ItemSlot({ itemId, itemName, amount, size = 64, className }: Ite
     >
       {showBlock ? (
         <BlockModel src={src} alt={itemName ?? ''} size={size} />
+      ) : isAnimated ? (
+        <AnimatedSprite
+          src={src}
+          alt={itemName ?? ''}
+          size={size}
+          frameCount={frames}
+          frameDuration={frameMs}
+        />
       ) : (
         /* eslint-disable-next-line @next/next/no-img-element */
         <img
