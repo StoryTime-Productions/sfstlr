@@ -1,8 +1,10 @@
 import textureIndex from '../../public/textures/index.json';
 import spriteFramesData from './sprite_frames.json';
+import spriteFrametimesData from './sprite_frametimes.json';
 
 const index = textureIndex as Record<string, string>;
 const spriteFrames = spriteFramesData as Record<string, number>;
+const spriteFrametimes = spriteFrametimesData as Record<string, number>;
 
 // Flat items that borrow another item's texture — these stay 2D even though
 // the resolved texture may live in a block folder.
@@ -87,6 +89,14 @@ export function getSpriteFrames(itemId: string): number {
   const key = itemId.toLowerCase().replace(/\s+/g, '_');
   const resolved = ALIASES[key] ?? key;
   return spriteFrames[resolved] ?? spriteFrames[key] ?? 1;
+}
+
+/** Returns the per-frame duration in ms for a sprite-column texture (from mcmeta frametime × 50ms). */
+export function getSpriteFrameMs(itemId: string): number {
+  const key = itemId.toLowerCase().replace(/\s+/g, '_');
+  const resolved = ALIASES[key] ?? key;
+  const ticks = spriteFrametimes[resolved] ?? spriteFrametimes[key] ?? 1;
+  return ticks * 50;
 }
 
 /** True for vanilla Minecraft block textures or SF machine/block textures (renders as isometric 3D cube). */

@@ -14,7 +14,14 @@ if (-not (Test-Path $ZipPath)) {
 Write-Host "Opening ZIP: $ZipPath"
 $zip = [System.IO.Compression.ZipFile]::OpenRead($ZipPath)
 $index = @{}
+$frametimes = @{}  # key → frametime in ticks (default 1)
 $count = 0
+
+# First pass: collect all entries by full name for mcmeta lookup
+$entryMap = @{}
+foreach ($entry in $zip.Entries) {
+    $entryMap[$entry.FullName] = $entry
+}
 
 foreach ($entry in $zip.Entries) {
     if ($entry.FullName -match '\.png$' -and $entry.Name -ne '') {
@@ -39,6 +46,22 @@ foreach ($entry in $zip.Entries) {
         $key = [System.IO.Path]::GetFileNameWithoutExtension($entry.Name).ToLower()
         if (-not $index.ContainsKey($key)) {
             $index[$key] = $webPath
+
+            # Check for companion .mcmeta with animation frametime
+            $mcmetaName = $entry.FullName + '.mcmeta'
+            if ($entryMap.ContainsKey($mcmetaName)) {
+                $ms = $entryMap[$mcmetaName].Open()
+                $sr = New-Object System.IO.StreamReader($ms)
+                $mcmetaJson = $sr.ReadToEnd()
+                $sr.Close()
+                $ms.Close()
+                try {
+                    $mcmeta = $mcmetaJson | ConvertFrom-Json
+                    if ($mcmeta.animation -and $mcmeta.animation.frametime) {
+                        $frametimes[$key] = [int]$mcmeta.animation.frametime
+                    }
+                } catch {}
+            }
         }
         $count++
     }
@@ -50,6 +73,8 @@ $zip.Dispose()
 if (Test-Path $MinecraftJar) {
     Write-Host "Extracting vanilla textures from: $MinecraftJar"
     $mcZip = [System.IO.Compression.ZipFile]::OpenRead($MinecraftJar)
+    $mcEntryMap = @{}
+    foreach ($entry in $mcZip.Entries) { $mcEntryMap[$entry.FullName] = $entry }
     $vanillaCount = 0
     foreach ($entry in $mcZip.Entries) {
         $isItem  = $entry.FullName -like "assets/minecraft/textures/item/*.png"
@@ -72,6 +97,22 @@ if (Test-Path $MinecraftJar) {
             $key = [System.IO.Path]::GetFileNameWithoutExtension($entry.Name).ToLower()
             if ($isItem -or -not $index.ContainsKey($key)) {
                 $index[$key] = $webPath
+
+                # mcmeta frametime for vanilla animated textures
+                $mcmetaName = $entry.FullName + '.mcmeta'
+                if ($mcEntryMap.ContainsKey($mcmetaName)) {
+                    $ms = $mcEntryMap[$mcmetaName].Open()
+                    $sr = New-Object System.IO.StreamReader($ms)
+                    $mcmetaJson = $sr.ReadToEnd()
+                    $sr.Close()
+                    $ms.Close()
+                    try {
+                        $mcmeta = $mcmetaJson | ConvertFrom-Json
+                        if ($mcmeta.animation -and $mcmeta.animation.frametime) {
+                            $frametimes[$key] = [int]$mcmeta.animation.frametime
+                        }
+                    } catch {}
+                }
             }
             $vanillaCount++
         }
@@ -95,5 +136,9 @@ if (Test-Path $MinecraftJar) {
 $indexPath = Join-Path $OutDir 'index.json'
 $index | ConvertTo-Json -Depth 2 | Set-Content -Path $indexPath -Encoding UTF8
 
+$frametimesPath = Join-Path (Split-Path (Split-Path $OutDir -Parent) -Parent) 'src/lib/sprite_frametimes.json'
+$frametimes | ConvertTo-Json -Depth 2 | Set-Content -Path $frametimesPath -Encoding UTF8
+
 Write-Host "Extracted $count SF textures"
 Write-Host "Index: $indexPath ($($index.Count) entries)"
+Write-Host "Frametimes: $frametimesPath ($($frametimes.Count) animated textures)"
