@@ -245,6 +245,45 @@ describe('resolve — cycle detection', () => {
 // resolve — multiple targets
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// resolve — alternative recipes (cheapest-path auto-selection)
+// ---------------------------------------------------------------------------
+
+describe('resolve — alternative recipes', () => {
+  it('auto-selects the cheaper alt recipe for CARBON (Diamond over Coal)', () => {
+    const CARBON = makeItem('CARBON', 'Carbon', 'compressor', 1, [{ value: 'Coal', amount: 8 }]);
+    const map = itemMap([CARBON]);
+    const { steps } = resolve([{ id: 'CARBON', amount: 4 }], map);
+
+    expect(steps).toHaveLength(1);
+    expect(steps[0].usedAlt).toBe(true);
+    expect(steps[0].recipeType).toBe('grind_stone');
+    expect(steps[0].yield).toBe(4);
+    expect(steps[0].ingredients).toHaveLength(1);
+    expect(steps[0].ingredients[0]).toMatchObject({ value: 'Diamond', amount: 1, isSF: false });
+  });
+
+  it('falls back to the upstream recipe when useAltRecipes is false', () => {
+    const CARBON = makeItem('CARBON', 'Carbon', 'compressor', 1, [{ value: 'Coal', amount: 8 }]);
+    const map = itemMap([CARBON]);
+    const { steps } = resolve([{ id: 'CARBON', amount: 4 }], map, { useAltRecipes: false });
+
+    expect(steps).toHaveLength(1);
+    expect(steps[0].usedAlt).toBe(false);
+    expect(steps[0].ingredients[0]).toMatchObject({ value: 'Coal', amount: 8 });
+  });
+
+  it('does not mark a step as alt when only the upstream recipe exists', () => {
+    const IRON = makeItem('Iron Ingot', 'Iron Ingot', 'null', 1, []);
+    const DUST = makeItem('IRON_DUST', 'Iron Dust', 'enhanced_crafting_table', 1, [
+      { value: 'Iron Ingot', amount: 1 },
+    ]);
+    const map = itemMap([IRON, DUST]);
+    const { steps } = resolve([{ id: 'IRON_DUST', amount: 1 }], map);
+    expect(steps[0].usedAlt).toBe(false);
+  });
+});
+
 describe('resolve — multiple targets', () => {
   it('aggregates steps from multiple targets', () => {
     const IRON = makeItem('Iron Ingot', 'Iron Ingot', 'null', 1, []);

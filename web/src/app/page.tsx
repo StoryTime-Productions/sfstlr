@@ -23,6 +23,7 @@ interface Step {
   operations: number;
   yield: number;
   totalProduced: number;
+  usedAlt: boolean;
   ingredients: Ingredient[];
 }
 interface ResolveResult {
@@ -53,9 +54,10 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [allExpanded, setAllExpanded] = useState<boolean | undefined>(undefined);
   const [showStacks, setShowStacks] = useState(false);
+  const [useAltRecipes, setUseAltRecipes] = useState(true);
   const [copied, setCopied] = useState(false);
 
-  const calculate = useCallback(async (targetList: Target[]) => {
+  const calculate = useCallback(async (targetList: Target[], altRecipes: boolean) => {
     if (targetList.length === 0) return;
     setLoading(true);
     setError(null);
@@ -64,7 +66,7 @@ export default function Home() {
       const res = await fetch('/api/resolve', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ items: targetList }),
+        body: JSON.stringify({ items: targetList, useAltRecipes: altRecipes }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -97,9 +99,15 @@ export default function Home() {
     const parsed = decodeTargets(raw);
     if (parsed.length === 0) return;
     setTargets(parsed);
-    calculate(parsed);
+    calculate(parsed, useAltRecipes);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  function toggleAltRecipes() {
+    const next = !useAltRecipes;
+    setUseAltRecipes(next);
+    if (result) calculate(targets, next);
+  }
 
   function addTarget() {
     const id = inputId.trim().toUpperCase();
@@ -183,13 +191,20 @@ export default function Home() {
           </div>
         )}
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
           <button
-            onClick={() => calculate(targets)}
+            onClick={() => calculate(targets, useAltRecipes)}
             disabled={targets.length === 0 || loading}
             className="px-6 py-2 rounded bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 disabled:opacity-40 transition-opacity"
           >
             {loading ? 'Calculating…' : 'Calculate'}
+          </button>
+          <button
+            onClick={toggleAltRecipes}
+            title="When on, uses the cheapest known recipe for each item, including recipes missing from the default data (items can have more than one real in-game recipe)."
+            className={`text-xs px-2 py-2 rounded transition-colors ${useAltRecipes ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground'}`}
+          >
+            Alt Recipes: {useAltRecipes ? 'On' : 'Off'}
           </button>
           {result && (
             <button

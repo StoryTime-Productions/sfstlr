@@ -58,8 +58,11 @@ export function formatResult({ steps, rawMaterials, warnings }, targets, opts = 
       const machine = `${C.cyan}[${machineLabel(step.recipeType)}]${C.reset}`;
       const item = `${C.bold}${step.name}${C.reset} x${step.totalProduced}`;
       const ops = step.operations > 1 ? `${C.dim}(${step.operations} operations)${C.reset}` : '';
+      const alt = step.usedAlt ? `${C.yellow}(alt)${C.reset}` : '';
 
-      lines.push(`STEP ${String(step.stepNumber).padStart(2)}  ${machine}  ${item}  ${ops}`);
+      lines.push(
+        `STEP ${String(step.stepNumber).padStart(2)}  ${machine}  ${item}  ${ops}  ${alt}`
+      );
 
       // Merge duplicate ingredient slots (same value can appear in multiple grid slots)
       const ingMerged = new Map();
