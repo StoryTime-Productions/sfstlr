@@ -58,7 +58,8 @@ export async function POST(req: NextRequest) {
     ),
   }));
 
-  const result = resolve(targets, items as Map<string, object>);
+  const useAltRecipes = body.useAltRecipes !== false;
+  const result = resolve(targets, items as Map<string, object>, { useAltRecipes });
 
   return NextResponse.json({
     targets,
@@ -77,11 +78,12 @@ export async function GET(req: NextRequest) {
     const [id, amount] = s.split(':');
     return { id, amount: parseInt(amount ?? '1', 10) || 1 };
   });
+  const useAltRecipes = req.nextUrl.searchParams.get('useAltRecipes') !== 'false';
 
   return POST(
     new NextRequest(req.url, {
       method: 'POST',
-      body: JSON.stringify({ items: items_param }),
+      body: JSON.stringify({ items: items_param, useAltRecipes }),
       headers: { 'content-type': 'application/json' },
     })
   );

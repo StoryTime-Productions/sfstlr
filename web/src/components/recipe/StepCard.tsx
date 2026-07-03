@@ -20,6 +20,7 @@ interface Step {
   operations: number;
   yield: number;
   totalProduced: number;
+  usedAlt: boolean;
   ingredients: Ingredient[];
 }
 
@@ -76,6 +77,15 @@ export function StepCard({ step, isLast, forceExpanded, showStacks = false }: St
           <span className="text-sm font-semibold text-primary flex-1 truncate">
             {machineLabel(step.recipeType)}
           </span>
+
+          {step.usedAlt && (
+            <span
+              title="This step uses a real in-game recipe that's missing from the default recipe data (this item has more than one known recipe)."
+              className="text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-500 shrink-0"
+            >
+              Alt
+            </span>
+          )}
 
           {/* Collapsed summary: output thumbnail + name */}
           {!expanded && (

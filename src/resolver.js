@@ -1,30 +1,20 @@
-import { BLACKLISTED_ITEMS, BLACKLISTED_RECIPE_TYPES } from './blacklist.js';
-
-// An ingredient value is a Slimefun item if it is entirely uppercase (and has no spaces)
-function isSFItem(value) {
-  return value === value.toUpperCase() && !value.includes(' ');
-}
-
-function isExpandable(item) {
-  if (!item) return false;
-  if (BLACKLISTED_ITEMS.has(item.id)) return false;
-  if (BLACKLISTED_RECIPE_TYPES.has(item.recipeType)) return false;
-  return true;
-}
+import { isSFItem, isExpandable } from './item-utils.js';
+import { computeCheapestRecipes } from './costing.js';
 
 /**
  * Resolve the full recipe tree for a list of target items.
  *
  * @param {Array<{id: string, amount: number}>} targets
  * @param {Map<string, object>} itemMap
+ * @param {{ useAltRecipes?: boolean }} [opts] - set useAltRecipes: false to only use upstream recipes
  * @returns {{ steps: CraftStep[], rawMaterials: Map<string, number>, warnings: string[] }}
  *
  * CraftStep = {
- *   id, name, recipeType, operations, yield,
+ *   id, name, recipeType, operations, yield, usedAlt,
  *   ingredients: [{value, amount, totalNeeded, isSF}]
  * }
  */
-export function resolve(targets, itemMap) {
+export function resolve(targets, itemMap, opts = {}) {
   const warnings = [];
 
   // operations[id] = total number of crafting operations needed for that SF item
@@ -33,23 +23,28 @@ export function resolve(targets, itemMap) {
   const deps = new Map();
 
   const visiting = new Set(); // cycle detection
+  const costing = computeCheapestRecipes(itemMap, { useAltRecipes: opts.useAltRecipes });
 
   function expand(id, needed) {
     const item = itemMap.get(id);
     if (!item || !isExpandable(item)) return; // raw / blacklisted — leaf node
 
-    const ops = Math.ceil(needed / item.result);
-    operations.set(id, (operations.get(id) ?? 0) + ops);
-
-    if (!deps.has(id)) deps.set(id, new Set());
-
     if (visiting.has(id)) {
       warnings.push(`Cycle detected at ${id} — breaking.`);
       return;
     }
+
+    const recipe = costing.getRecipe(id);
+    if (!recipe) return; // no usable candidate (e.g. zero-yield) — treat as leaf
+
+    const ops = Math.ceil(needed / recipe.result);
+    operations.set(id, (operations.get(id) ?? 0) + ops);
+
+    if (!deps.has(id)) deps.set(id, new Set());
+
     visiting.add(id);
 
-    for (const ing of item.recipe ?? []) {
+    for (const ing of recipe.recipe ?? []) {
       const ingTotal = ing.amount * ops;
       if (isSFItem(ing.value)) {
         const ingItem = itemMap.get(ing.value);
@@ -115,8 +110,9 @@ export function resolve(targets, itemMap) {
   // Build step objects in crafting order (leaves first)
   const steps = sorted.map((id, idx) => {
     const item = itemMap.get(id);
+    const recipe = costing.getRecipe(id);
     const ops = operations.get(id);
-    const ingredients = (item.recipe ?? []).map((ing) => {
+    const ingredients = (recipe.recipe ?? []).map((ing) => {
       const totalNeeded = ing.amount * ops;
       return { value: ing.value, amount: ing.amount, totalNeeded, isSF: isSFItem(ing.value) };
     });
@@ -124,10 +120,11 @@ export function resolve(targets, itemMap) {
       stepNumber: idx + 1,
       id,
       name: cleanName(item.name),
-      recipeType: item.recipeType ?? 'null',
+      recipeType: recipe.recipeType ?? 'null',
       operations: ops,
-      yield: item.result,
-      totalProduced: ops * item.result,
+      yield: recipe.result,
+      totalProduced: ops * recipe.result,
+      usedAlt: !!recipe.usedAlt,
       ingredients,
     };
   });
